@@ -213,6 +213,8 @@ npm run build:web
 
 Perintah di atas akan mengunduh Flutter SDK (menggunakan cache `.vercel/cache` bila tersedia) dan menghasilkan artefak di `build/web`.
 
+> ℹ️ **Catatan root warning**: Vercel menjalankan build sebagai user `root`. Skrip `scripts/vercel-build.sh` kini otomatis mengekspor `FLUTTER_ALLOW_ROOT=1`, `CI=true`, dan `FLUTTER_SUPPRESS_ANALYTICS=1` sehingga peringatan “Woah! You appear to be trying to run flutter as root” diabaikan secara aman dan proses build tetap non-interaktif.
+
 ### 2. Hubungkan repo ke Vercel
 
 1. Buka [vercel.com](https://vercel.com) dan pilih **Add New Project → Import Git Repository**.

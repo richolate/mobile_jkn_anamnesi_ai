@@ -24,6 +24,11 @@ else
 fi
 
 export PATH="$FLUTTER_SDK_DIR/bin:$PATH"
+export FLUTTER_ALLOW_ROOT=1
+export FLUTTER_SUPPRESS_ANALYTICS=1
+export CI=${CI:-true}
+export PUB_CACHE="$CACHE_DIR/pub-cache"
+mkdir -p "$PUB_CACHE"
 
 pushd "$REPO_ROOT" >/dev/null
 
