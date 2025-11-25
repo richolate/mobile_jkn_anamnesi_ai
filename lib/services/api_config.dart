@@ -1,8 +1,7 @@
 class ApiConfig {
   // Gemini API Key - IMPORTANT: Ganti dengan API key Anda
   // Get your API key from: https://makersuite.google.com/app/apikey
-  static const String geminiApiKey =
-      'AIzaSyAHKfMuktkmIk7_rjXVaiOAX8s1gBF8igU'; // GANTI DENGAN API KEY ANDA
+  static const String geminiApiKey = ''; // GANTI DENGAN API KEY ANDA
 
   // RAG Server Endpoint
   // Options:
