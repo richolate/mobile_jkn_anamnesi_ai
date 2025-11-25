@@ -34,6 +34,19 @@ git config --global --add safe.directory "$FLUTTER_SDK_DIR" >/dev/null 2>&1 || t
 
 pushd "$REPO_ROOT" >/dev/null
 
+# Create .env file from Vercel environment variables
+echo "Creating .env file from environment variables..."
+cat > .env << EOF
+GEMINI_API_KEY=${GEMINI_API_KEY:-}
+RAG_SERVER_URL=${RAG_SERVER_URL:-http://localhost:8001}
+GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash-lite}
+API_TIMEOUT=${API_TIMEOUT:-120}
+RAG_TIMEOUT=${RAG_TIMEOUT:-120}
+EOF
+
+echo ".env file created:"
+cat .env
+
 flutter config --enable-web
 flutter config --no-analytics --no-cli-animations
 flutter --version

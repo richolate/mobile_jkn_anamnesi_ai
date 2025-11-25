@@ -56,12 +56,14 @@ Lihat output di console:
 
 ## 🌐 Deployment ke Vercel
 
+⚠️ **PENTING:** Lihat dokumentasi lengkap di [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
+
 ### Option 1: Via Vercel Dashboard (Recommended)
 
 1. Login ke [Vercel Dashboard](https://vercel.com/dashboard)
 2. Pilih project Anda
 3. Klik **Settings** → **Environment Variables**
-4. Tambahkan variabel berikut:
+4. Tambahkan variabel berikut (WAJIB minimal GEMINI_API_KEY):
 
 | Variable Name | Value | Environments |
 |--------------|-------|--------------|
@@ -71,8 +73,10 @@ Lihat output di console:
 | `API_TIMEOUT` | `120` | Production, Preview, Development |
 | `RAG_TIMEOUT` | `120` | Production, Preview, Development |
 
-5. Klik **Save**
-6. Redeploy project Anda
+5. Klik **Save** untuk setiap variabel
+6. Redeploy project Anda (Deployments → Redeploy)
+
+💡 **Script build akan otomatis membuat file `.env` dari environment variables ini!**
 
 ### Option 2: Via Vercel CLI
 

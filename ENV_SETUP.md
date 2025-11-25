@@ -21,23 +21,28 @@
    - Klik "Create API Key"
    - Copy API key dan paste ke `.env`
 
-### 2. Setup untuk Vercel Deployment
+### Step 2: Setup untuk Vercel Deployment
 
-#### Via Vercel Dashboard:
-1. Buka project Anda di Vercel Dashboard
-2. Pilih **Settings** → **Environment Variables**
-3. Tambahkan variabel berikut:
+⚠️ **PENTING:** File `.env` tidak di-commit ke Git (ada di `.gitignore`), jadi Anda HARUS setup environment variables di Vercel!
 
-```
-GEMINI_API_KEY=your_actual_api_key_here
-RAG_SERVER_URL=https://your-rag-server.vercel.app
-GEMINI_MODEL=gemini-2.0-flash-lite
-API_TIMEOUT=120
-RAG_TIMEOUT=120
-```
+#### Via Vercel Dashboard (Recommended):
+1. Login ke [Vercel Dashboard](https://vercel.com/dashboard)
+2. Pilih project Anda
+3. Klik **Settings** → **Environment Variables**
+4. Tambahkan variabel berikut (satu per satu):
 
-4. Pilih environment: **Production**, **Preview**, dan **Development**
-5. Klik **Save**
+| Key | Value | Environment |
+|-----|-------|-------------|
+| `GEMINI_API_KEY` | `AIzaSy...` (API key Anda) | Production, Preview, Development |
+| `RAG_SERVER_URL` | `https://your-rag-server.com` | Production, Preview, Development |
+| `GEMINI_MODEL` | `gemini-2.0-flash-lite` | Production, Preview, Development |
+| `API_TIMEOUT` | `120` | Production, Preview, Development |
+| `RAG_TIMEOUT` | `120` | Production, Preview, Development |
+
+5. Klik **Save** untuk setiap variabel
+6. **Redeploy** project Anda (Settings → Deployments → Redeploy)
+
+💡 **Script build (`vercel-build.sh`) akan otomatis membuat file `.env` dari environment variables ini saat build!**
 
 #### Via Vercel CLI:
 ```bash
