@@ -1,331 +1,387 @@
-# Mobile JKN# Mobile JKN - Aplikasi Peraga
+# Mobile JKN - Aplikasi Kesehatan AI# Mobile JKN - Aplikasi Kesehatan AI
 
 
 
-Aplikasi mobile kesehatan berbasis Flutter dengan fitur AI untuk konsultasi anamnesis dan analisis gambar medis.Aplikasi peraga Mobile JKN untuk demo fitur BPJS Kesehatan.
+Aplikasi mobile kesehatan berbasis Flutter dengan fitur AI untuk konsultasi anamnesis dan analisis gambar medis menggunakan Google Gemini.Aplikasi mobile kesehatan berbasis Flutter dengan fitur AI untuk konsultasi anamnesis dan analisis gambar medis menggunakan Google Gemini.
 
 
 
-## 📱 Fitur Utama## Deskripsi
+## 🚀 Quick Start## 🚀 Quick Start
 
 
 
-### 1. Anamnesa AIMobile JKN adalah aplikasi mobile yang dikembangkan untuk memudahkan peserta BPJS Kesehatan dalam mengakses berbagai layanan kesehatannya. Aplikasi peraga ini dibuat untuk demo fitur yang akan dikembangkan lebih lanjut.
+### Prerequisites### Prerequisites
 
-- Konsultasi anamnesis interaktif dengan AI
+- Flutter SDK 3.32.5+- Flutter SDK 3.32.5+
 
-- Pertanyaan dinamis berdasarkan keluhan pasien (6-18 pertanyaan)## Fitur
+- Dart SDK 3.8.1+- Dart SDK 3.8.1+
 
-- Input detail untuk pertanyaan tertentu
+- Google Gemini API Key ([Dapatkan di sini](https://makersuite.google.com/app/apikey))- Google Gemini API Key ([Dapatkan di sini](https://makersuite.google.com/app/apikey))
 
-- Diagnosis otomatis dengan rekomendasi tindakan### 1. Onboarding Screen
 
-- Ekspor hasil konsultasi ke PDF- Tampilan loading saat pertama kali membuka aplikasi
 
-- Animasi splash screen dengan wave pattern
+### Instalasi### Instalasi
 
-### 2. Analisis Gambar Medis- Logo Mobile JKN
 
-- Upload gambar medis (X-ray, CT scan, MRI, dll)- Auto-navigate ke Homepage setelah 3 detik
 
-- Analisis gambar menggunakan AI (Google Gemini Vision)
+```bash```bash
 
-- Deteksi temuan normal dan abnormal### 2. Homepage
+# 1. Clone repository# 1. Clone repository
 
-- Red flags untuk kondisi darurat- Header dengan gradient dan user info
+git clone <repository-url>git clone <repository-url>
 
-- Rekomendasi tindakan medis- Info status kepesertaan
+cd mobile_jkn_anamnesa_aicd mobile_jkn_anamnesa_ai
 
-- Ekspor hasil analisis ke PDF (termasuk gambar)- Card "Antrean Online"
 
-- Menu grid dengan berbagai layanan:
 
-### 3. SoulMed (RAG Chatbot)  - Info Program JKN
+# 2. Install dependencies# 2. Install dependencies
 
-- Chatbot kesehatan berbasis RAG (Retrieval-Augmented Generation)  - TELEHEALTH
+flutter pub getflutter pub get
 
-- Pertanyaan seputar kesehatan umum  - Info Riwayat Pelayanan
 
-- Riwayat pencarian tersimpan  - Bugar (Baru)
 
-- Integrasi dengan server RAG eksternal  - NEW Rehab (Cicilan)
+# 3. Setup environment variables# 3. Setup environment variables
 
-  - Penambahan Peserta
+cp .env.example .envcp .env.example .env
 
-### 4. Riwayat Konsultasi  - Info Peserta
+# Edit .env dan isi GEMINI_API_KEY Anda# Edit .env dan isi GEMINI_API_KEY Anda
 
-- Tab Anamnesis: Riwayat konsultasi anamnesis lengkap  - SOS
 
-- Tab Analisis Gambar: Riwayat analisis gambar medis  - Info Lokasi Faskes
 
-- Detail lengkap setiap konsultasi  - Perubahan Data Peserta (Baru)
+# 4. Run aplikasi# 4. Run aplikasi
 
-- Cetak ulang PDF  - Pengaduan Layanan JKN
-
-- Hapus riwayat  - Menu Lainnya
-
-- Banner AUTODEBIT IURAN JKN-KIS
-
-### 5. Cari Dokter Terdekat- Bottom Navigation Bar dengan 5 menu:
-
-- Pencarian dokter berdasarkan diagnosis  - Home
-
-- Integrasi Google Maps  - Berita
-
-- Informasi lokasi faskes terdekat  - Kartu
-
-  - FAQ
-
-## 🛠 Teknologi  - Profil
-
-
-
-### Framework### 3. Menu Detail Screen
-
-- **Flutter** 3.32.5+- Setiap menu memiliki halaman detail
-
-- **Dart** 3.8.1+- Sementara menampilkan judul menu saja
-
-- Siap untuk dikembangkan lebih lanjut
-
-### Dependencies Utama
-
-```yaml## Teknologi
-
-google_generative_ai: ^0.2.2    # AI (Gemini)
-
-sqflite: ^2.3.0                 # Database lokal### Framework & Dependencies
-
-pdf: ^3.11.1                    # Generate PDF
-
-share_plus: ^10.1.2             # Share PDF- **Flutter**: Framework utama
-
-image_picker: ^1.0.7            # Upload gambar- **Provider**: State management
-
-webview_flutter: ^4.4.2         # WebView- **Google Fonts**: Typography
-
-http: ^1.6.0                    # API calls- **WebView Flutter**: Untuk integrasi React nantinya
-
-```- **Flutter InAppWebView**: WebView advanced untuk React integration
-
-- **Go Router**: Navigation
-
-## 🚀 Setup & Instalasi- **HTTP & Dio**: Network requests
-
-- **Shared Preferences**: Local storage
-
-### Prerequisites
-
-- Flutter SDK 3.32.5 atau lebih baru
-- Dart SDK 3.8.1 atau lebih baru
-- Android Studio / VS Code
-- Google Gemini API Key ([Dapatkan di sini](https://makersuite.google.com/app/apikey))
-
-### Langkah Instalasi
-
-1. **Clone repository**
-```bash
-git clone <repository-url>
-cd mobile_jkn_anamnesa_ai
-```
-
-2. **Install dependencies**
-```bash
-flutter pub get
-```
-
-3. **Setup Environment Variables** ⭐ PENTING!
-
-Buat file `.env` di root project:
-```bash
-cp .env.example .env
-```
-
-Edit file `.env` dan masukkan API Key Anda:
-```env
-GEMINI_API_KEY=your_actual_api_key_here
-RAG_SERVER_URL=http://localhost:8001
-GEMINI_MODEL=gemini-2.0-flash-lite
-API_TIMEOUT=120
-RAG_TIMEOUT=120
-```
-
-📖 **Dokumentasi lengkap:** Lihat [ENV_SETUP.md](ENV_SETUP.md)
-
-4. **Verifikasi Setup**
-```bash
-flutter run
-```
-
-Pastikan di console muncul: `✅ Configuration loaded successfully`
-
-### Troubleshooting
-
-Jika mengalami error:
-- **SocketException / Failed host lookup**: Lihat [TROUBLESHOOTING_SOCKET_ERROR.md](TROUBLESHOOTING_SOCKET_ERROR.md)
-- **MissingPluginException di Web**: Lihat [WEB_PLATFORM_FIX.md](WEB_PLATFORM_FIX.md)
-
-### Persiapan untuk React Integration
-
-Aplikasi ini sudah dilengkapi dengan dependency untuk integrasi React:
-- `webview_flutter`: WebView dasar
-
-- `flutter_inappwebview`: WebView advanced dengan lebih banyak kontrol
-
-1. **Clone repository**
-
-```bashRencana pengembangan:
-
-git clone <repository-url>1. Salah satu menu di Homepage akan menggunakan React
-
-cd mobile_jkn2. Ketika menu tersebut dibuka, akan load halaman React menggunakan WebView
-
-```3. React app akan dikembangkan terpisah dan di-load melalui WebView
-
-
-
-2. **Install dependencies**## Instalasi
-
-```bash
-
-flutter pub get1. Clone repository ini
-
-```2. Install dependencies:
-
-   ```bash
-
-3. **Konfigurasi API Key**   flutter pub get
-
-   ```
-
-Edit file `lib/services/api_config.dart`:3. Jalankan aplikasi:
-
-```dart   ```bash
-
-class ApiConfig {   flutter run
-
-  static const String geminiApiKey = 'YOUR_GEMINI_API_KEY';   ```
-
-  static const String ragServerUrl = 'http://your-rag-server:8000';
-
-}## Struktur Folder
-
-```
-
-```
-
-4. **Run aplikasi**lib/
-
-```bash├── main.dart                 # Entry point aplikasi
-
-flutter run├── models/                   # Data models
-
-```│   └── menu_item.dart
-
-├── screens/                  # Screens/Pages
-
-## 📦 Build APK│   ├── onboarding_screen.dart
-
-│   ├── home_screen.dart
-
-### Debug APK (untuk testing)│   └── menu_detail_screen.dart
-
-```bash├── widgets/                  # Reusable widgets
-
-flutter build apk --debug│   └── menu_item_widget.dart
-
-```└── utils/                    # Utilities
-
-APK tersimpan di: `build/app/outputs/flutter-apk/app-debug.apk`    └── app_theme.dart        # Theme & Colors
-
-
-
-## 🌐 Demo via Vercel
-
-Gunakan konfigurasi `vercel.json` dan skrip `scripts/vercel-build.sh` yang baru untuk menerbitkan build Flutter Web secara otomatis di Vercel.
-
-### 1. Siapkan lingkungan lokal
-
-- Pastikan Flutter Web aktif: `flutter config --enable-web`
-- Uji build sebelum deploy:
-
-```bash
-npm run build:web
-```
-
-Perintah di atas (jalan­kan via Git Bash/WSL karena memakai Bash) akan mengunduh Flutter SDK 3.32.5 (kanal stable), menandai cache `.vercel/cache/flutter-<versi>` sebagai `git safe.directory`, lalu menghasilkan artefak di `build/web`.
-
-> ℹ️ **Catatan root & git warning**: Build di Vercel berjalan sebagai user `root`. Skrip `scripts/vercel-build.sh` sudah men-set `FLUTTER_ALLOW_ROOT=1`, `CI=true`, `FLUTTER_SUPPRESS_ANALYTICS=1`, mematikan animasi CLI, serta menjalankan `git config --global --add safe.directory <cache_flutter>`. Jadi pesan “Woah! You appear to be trying to run flutter as root” dan `fatal: detected dubious ownership` tidak lagi menghentikan build.
-
-### 2. Hubungkan repo ke Vercel
-
-1. Buka [vercel.com](https://vercel.com) dan pilih **Add New Project → Import Git Repository**.
-2. Pilih repositori `mobile_jkn_anamnesi_ai` dari GitHub Anda.
-3. Pada pengaturan proyek:
-  - **Framework preset**: `Other`
-  - **Build command**: `npm run vercel-build`
-  - **Output directory**: `build/web`
-  - **Install command**: biarkan default (`npm install`)
-4. Tambahkan Environment Variables penting melalui tab **Settings → Environment Variables** (scope: Production + Preview):
-   - `GEMINI_API_KEY` → isi dengan API key Google Gemini Anda
-   - `RAG_SERVER_URL` → isi dengan endpoint server RAG Anda
-   - Opsional: `FLUTTER_VERSION`, `FLUTTER_CHANNEL`, atau `FLUTTER_ARCHIVE` jika ingin mencoba build eksperimen.
-5. Klik **Deploy**. Vercel akan menjalankan skrip build dan meng-host hasilnya sebagai aplikasi web statis.
-
-### 3. Kustomisasi build di Vercel
-
-- Secara bawaan skrip akan mengambil Flutter `3.32.5` kanal `stable`. Override versi bila diperlukan:
-
-```bash
-FLUTTER_VERSION=3.33.0 FLUTTER_CHANNEL=beta npm run vercel-build
-```
-
-- Jika Anda membutuhkan cache bersih pada Vercel, hapus folder `.vercel/cache` melalui dashboard (Project → Settings → Git → Clear Build Cache).
-- Bila build gagal di langkah unduh Flutter, cukup redeploy setelah koneksi stabil; cache ~700 MB hanya perlu sekali.
-- Warning Node versi (`"engines": { "node": ">=18" }`) aman diabaikan karena runtime Vercel sudah berada di Node 18.
-
-Setelah konfigurasi ini, setiap push ke branch yang terhubung akan otomatis membangun dan menerbitkan demo web terbaru di Vercel.
-
-
-### Release APK (untuk production)assets/
-
-```bash├── images/                   # Images
-
-flutter build apk --release└── icons/                    # Icons
+flutter runflutter run
 
 ``````
 
-APK tersimpan di: `build/app/outputs/flutter-apk/app-release.apk`
+
+
+Pastikan di console muncul: `✅ Configuration loaded successfully`Pastikan di console muncul: `✅ Configuration loaded successfully`
+
+
+
+## 📱 Fitur Utama### Persiapan untuk React Integration
+
+
+
+### 1. Anamnesa AIAplikasi ini sudah dilengkapi dengan dependency untuk integrasi React:
+
+- Konsultasi anamnesis interaktif dengan AI- `webview_flutter`: WebView dasar
+
+- Pertanyaan dinamis (6-18 pertanyaan)
+
+- Diagnosis otomatis dengan rekomendasi- `flutter_inappwebview`: WebView advanced dengan lebih banyak kontrol
+
+- Ekspor hasil ke PDF
+
+1. **Clone repository**
+
+### 2. Analisis Gambar Medis
+
+- Upload gambar medis (X-ray, CT scan, MRI)```bashRencana pengembangan:
+
+- Analisis menggunakan Google Gemini Vision
+
+- Deteksi temuan normal/abnormalgit clone <repository-url>1. Salah satu menu di Homepage akan menggunakan React
+
+- Ekspor hasil analisis ke PDF
+
+cd mobile_jkn2. Ketika menu tersebut dibuka, akan load halaman React menggunakan WebView
+
+### 3. SoulMed (RAG Chatbot)
+
+- Chatbot kesehatan berbasis RAG```3. React app akan dikembangkan terpisah dan di-load melalui WebView
+
+- Riwayat pencarian tersimpan
+
+
+
+### 4. Riwayat Konsultasi
+
+- Riwayat anamnesis & analisis gambar2. **Install dependencies**## Instalasi
+
+- Detail lengkap setiap konsultasi
+
+- Cetak ulang PDF```bash
+
+
+
+## 🛠️ Tech Stackflutter pub get1. Clone repository ini
+
+
+
+- **Flutter** 3.32.5 / **Dart** 3.8.1```2. Install dependencies:
+
+- **google_generative_ai** - AI Gemini
+
+- **sqflite** - Database lokal (mobile)   ```bash
+
+- **shared_preferences** - Storage web
+
+- **pdf** - Generate PDF3. **Konfigurasi API Key**   flutter pub get
+
+- **flutter_dotenv** - Environment variables
+
+   ```
+
+## 📂 Struktur Project
+
+Edit file `lib/services/api_config.dart`:3. Jalankan aplikasi:
+
+```
+
+lib/```dart   ```bash
+
+├── main.dart                    # Entry point
+
+├── models/                      # Data modelsclass ApiConfig {   flutter run
+
+├── screens/                     # Semua halaman UI
+
+│   ├── anamnesa_ai_screen.dart  static const String geminiApiKey = 'YOUR_GEMINI_API_KEY';   ```
+
+│   ├── konsultasi_anamnesis_screen.dart
+
+│   ├── analisis_gambar_medis_screen.dart  static const String ragServerUrl = 'http://your-rag-server:8000';
+
+│   ├── soulmed_screen.dart
+
+│   └── riwayat_konsultasi_screen.dart}## Struktur Folder
+
+├── services/                    # Business logic
+
+│   ├── api_config.dart          # Konfigurasi API```
+
+│   ├── gemini_service.dart      # Service Gemini AI
+
+│   ├── database_service.dart    # Conditional export DB```
+
+│   └── pdf_export.dart          # Conditional export PDF
+
+├── widgets/                     # Reusable widgets4. **Run aplikasi**lib/
+
+└── utils/                       # Utilities & constants
+
+``````bash├── main.dart                 # Entry point aplikasi
+
+
+
+## 📦 Build & Deployflutter run├── models/                   # Data models
+
+
+
+### Build APK```│   └── menu_item.dart
+
+```bash
+
+# Debug├── screens/                  # Screens/Pages
+
+flutter build apk --debug
+
+## 📦 Build APK│   ├── onboarding_screen.dart
+
+# Release
+
+flutter build apk --release│   ├── home_screen.dart
+
+
+
+# Split per ABI (lebih kecil)### Debug APK (untuk testing)│   └── menu_detail_screen.dart
+
+flutter build apk --split-per-abi --release
+
+``````bash├── widgets/                  # Reusable widgets
+
+
+
+APK tersimpan di: `build/app/outputs/flutter-apk/`flutter build apk --debug│   └── menu_item_widget.dart
+
+
+
+### Deploy ke Vercel (Web)```└── utils/                    # Utilities
+
+1. Set environment variables di Vercel Dashboard:
+
+   - `GEMINI_API_KEY` (required)APK tersimpan di: `build/app/outputs/flutter-apk/app-debug.apk`    └── app_theme.dart        # Theme & Colors
+
+   - `RAG_SERVER_URL`
+
+   - `GEMINI_MODEL`
+
+2. Push ke GitHub
+
+3. Vercel auto-deploy menggunakan `scripts/vercel-build.sh`## 🌐 Demo via Vercel
+
+
+
+**Platform Support:**Gunakan konfigurasi `vercel.json` dan skrip `scripts/vercel-build.sh` yang baru untuk menerbitkan build Flutter Web secara otomatis di Vercel.
+
+- ✅ Android (native dengan SQLite)
+
+- ✅ iOS (native dengan SQLite)### 1. Siapkan lingkungan lokal
+
+- ✅ Web (SharedPreferences fallback)
+
+- Pastikan Flutter Web aktif: `flutter config --enable-web`
+
+App menggunakan conditional imports untuk support multi-platform.- Uji build sebelum deploy:
+
+
+
+## 🔧 Configuration```bash
+
+npm run build:web
+
+### File `.env````
+
+```env
+
+GEMINI_API_KEY=your_gemini_api_keyPerintah di atas (jalan­kan via Git Bash/WSL karena memakai Bash) akan mengunduh Flutter SDK 3.32.5 (kanal stable), menandai cache `.vercel/cache/flutter-<versi>` sebagai `git safe.directory`, lalu menghasilkan artefak di `build/web`.
+
+RAG_SERVER_URL=http://localhost:8001
+
+GEMINI_MODEL=gemini-2.0-flash-lite> ℹ️ **Catatan root & git warning**: Build di Vercel berjalan sebagai user `root`. Skrip `scripts/vercel-build.sh` sudah men-set `FLUTTER_ALLOW_ROOT=1`, `CI=true`, `FLUTTER_SUPPRESS_ANALYTICS=1`, mematikan animasi CLI, serta menjalankan `git config --global --add safe.directory <cache_flutter>`. Jadi pesan “Woah! You appear to be trying to run flutter as root” dan `fatal: detected dubious ownership` tidak lagi menghentikan build.
+
+API_TIMEOUT=120
+
+RAG_TIMEOUT=120### 2. Hubungkan repo ke Vercel
+
+```
+
+1. Buka [vercel.com](https://vercel.com) dan pilih **Add New Project → Import Git Repository**.
+
+### Android Permissions2. Pilih repositori `mobile_jkn_anamnesi_ai` dari GitHub Anda.
+
+Sudah dikonfigurasi di `AndroidManifest.xml`:3. Pada pengaturan proyek:
+
+- ✅ `INTERNET` - Akses internet  - **Framework preset**: `Other`
+
+- ✅ `ACCESS_NETWORK_STATE` - Status network  - **Build command**: `npm run vercel-build`
+
+- ✅ `usesCleartextTraffic` - Allow HTTP  - **Output directory**: `build/web`
+
+  - **Install command**: biarkan default (`npm install`)
+
+## 🐛 Troubleshooting4. Tambahkan Environment Variables penting melalui tab **Settings → Environment Variables** (scope: Production + Preview):
+
+   - `GEMINI_API_KEY` → isi dengan API key Google Gemini Anda
+
+### Build Error   - `RAG_SERVER_URL` → isi dengan endpoint server RAG Anda
+
+```bash   - Opsional: `FLUTTER_VERSION`, `FLUTTER_CHANNEL`, atau `FLUTTER_ARCHIVE` jika ingin mencoba build eksperimen.
+
+flutter clean5. Klik **Deploy**. Vercel akan menjalankan skrip build dan meng-host hasilnya sebagai aplikasi web statis.
+
+flutter pub get
+
+flutter run### 3. Kustomisasi build di Vercel
+
+```
+
+- Secara bawaan skrip akan mengambil Flutter `3.32.5` kanal `stable`. Override versi bila diperlukan:
+
+### API Error
+
+- Pastikan `GEMINI_API_KEY` sudah di-set di `.env````bash
+
+- Check internet connectionFLUTTER_VERSION=3.33.0 FLUTTER_CHANNEL=beta npm run vercel-build
+
+- Regenerate API key jika perlu```
+
+
+
+### No Internet di Android- Jika Anda membutuhkan cache bersih pada Vercel, hapus folder `.vercel/cache` melalui dashboard (Project → Settings → Git → Clear Build Cache).
+
+- Uninstall app lama- Bila build gagal di langkah unduh Flutter, cukup redeploy setelah koneksi stabil; cache ~700 MB hanya perlu sekali.
+
+- Build ulang dengan permission terbaru: `flutter build apk --release`- Warning Node versi (`"engines": { "node": ">=18" }`) aman diabaikan karena runtime Vercel sudah berada di Node 18.
+
+- Install APK baru
+
+Setelah konfigurasi ini, setiap push ke branch yang terhubung akan otomatis membangun dan menerbitkan demo web terbaru di Vercel.
+
+### Blank Page di Web/Vercel
+
+- Check Vercel environment variables
+
+- Check browser console (F12) untuk error### Release APK (untuk production)assets/
+
+- Pastikan `GEMINI_API_KEY` sudah di-set di Vercel Dashboard
+
+```bash├── images/                   # Images
+
+Dokumentasi lengkap troubleshooting ada di `FIX_SUMMARY.md`
+
+flutter build apk --release└── icons/                    # Icons
+
+## 📄 Documentation
+
+``````
+
+- **README.md** (ini) - Overview & quick start
+
+- **FIX_SUMMARY.md** - Dokumentasi fix terbaru (permission, web compatibility, security)APK tersimpan di: `build/app/outputs/flutter-apk/app-release.apk`
+
+- **.env.example** - Template environment variables
 
 ## Development Roadmap
 
+## 👨‍💻 Development
+
 ### Split APK per ABI (ukuran lebih kecil)
 
-```bash### Phase 1 (Current) ✅
+### Code Style
 
-flutter build apk --split-per-abi --release- [x] Onboarding screen dengan animasi
+```bash```bash### Phase 1 (Current) ✅
 
-```- [x] Homepage dengan UI sesuai desain
+# Format code
 
-Menghasilkan 3 APK:- [x] Menu grid
+dart format .flutter build apk --split-per-abi --release- [x] Onboarding screen dengan animasi
 
-- `app-armeabi-v7a-release.apk` (ARM 32-bit)- [x] Bottom navigation
 
-- `app-arm64-v8a-release.apk` (ARM 64-bit) - **Paling umum**- [x] Basic navigation antar halaman
 
-- `app-x86_64-release.apk` (Intel 64-bit)
+# Analyze```- [x] Homepage dengan UI sesuai desain
 
-### Phase 2 (Next)
+flutter analyze
 
-### App Bundle (untuk Google Play Store)- [ ] Implementasi halaman-halaman lainnya (Berita, Kartu, FAQ, Profil)
+```Menghasilkan 3 APK:- [x] Menu grid
 
-```bash- [ ] Integrasi React untuk salah satu menu
 
-flutter build appbundle --release- [ ] Setup WebView configuration
 
-```- [ ] React app development untuk menu tertentu
+### Commit Convention- `app-armeabi-v7a-release.apk` (ARM 32-bit)- [x] Bottom navigation
 
-Bundle tersimpan di: `build/app/outputs/bundle/release/app-release.aab`
+```
+
+feat: Tambah fitur baru- `app-arm64-v8a-release.apk` (ARM 64-bit) - **Paling umum**- [x] Basic navigation antar halaman
+
+fix: Perbaikan bug
+
+refactor: Refactoring code- `app-x86_64-release.apk` (Intel 64-bit)
+
+docs: Update dokumentasi
+
+```### Phase 2 (Next)
+
+
+
+## 📞 Support### App Bundle (untuk Google Play Store)- [ ] Implementasi halaman-halaman lainnya (Berita, Kartu, FAQ, Profil)
+
+
+
+Untuk pertanyaan atau masalah:```bash- [ ] Integrasi React untuk salah satu menu
+
+1. Check `FIX_SUMMARY.md` untuk troubleshooting
+
+2. Buat issue di repositoryflutter build appbundle --release- [ ] Setup WebView configuration
+
+
+
+---```- [ ] React app development untuk menu tertentu
+
+
+
+**Mobile JKN** - Aplikasi Kesehatan Digital 🏥Bundle tersimpan di: `build/app/outputs/bundle/release/app-release.aab`
+
 
 ### Phase 3 (Future)
 
