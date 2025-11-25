@@ -11,14 +11,20 @@ class ApiConfig {
     }
   }
 
-  // Gemini API Key - Loaded from .env file
+  // Gemini API Key - Loaded from .env file or dart-define
   // Get your API key from: https://makersuite.google.com/app/apikey
   static String get geminiApiKey {
-    return dotenv.env['GEMINI_API_KEY'] ??
-        const String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
+    // Priority: dart-define (web build) > .env file (mobile)
+    const compileTime = String.fromEnvironment(
+      'GEMINI_API_KEY',
+      defaultValue: '',
+    );
+    if (compileTime.isNotEmpty) return compileTime;
+
+    return dotenv.env['GEMINI_API_KEY'] ?? '';
   }
 
-  // RAG Server Endpoint - Loaded from .env file
+  // RAG Server Endpoint - Loaded from .env file or dart-define
   // Options:
   // 1. Local development: 'http://localhost:8001'
   // 2. Cloud Run: 'https://rag-medical-api-xxxxx.run.app'
@@ -27,34 +33,44 @@ class ApiConfig {
   //
   // FALLBACK: If RAG server unavailable, app will use Gemini AI automatically
   static String get ragServerUrl {
-    return dotenv.env['RAG_SERVER_URL'] ??
-        const String.fromEnvironment(
-          'RAG_SERVER_URL',
-          defaultValue: 'http://localhost:8001',
-        );
+    const compileTime = String.fromEnvironment(
+      'RAG_SERVER_URL',
+      defaultValue: '',
+    );
+    if (compileTime.isNotEmpty) return compileTime;
+
+    return dotenv.env['RAG_SERVER_URL'] ?? 'http://localhost:8001';
   }
 
   // Model Configuration
   static String get geminiModel {
-    return dotenv.env['GEMINI_MODEL'] ??
-        const String.fromEnvironment(
-          'GEMINI_MODEL',
-          defaultValue: 'gemini-2.0-flash-lite',
-        );
+    const compileTime = String.fromEnvironment(
+      'GEMINI_MODEL',
+      defaultValue: '',
+    );
+    if (compileTime.isNotEmpty) return compileTime;
+
+    return dotenv.env['GEMINI_MODEL'] ?? 'gemini-2.0-flash-lite';
   }
 
   // Timeouts
   static int get apiTimeout {
-    final timeout =
-        dotenv.env['API_TIMEOUT'] ??
-        const String.fromEnvironment('API_TIMEOUT', defaultValue: '120');
+    const compileTime = String.fromEnvironment('API_TIMEOUT', defaultValue: '');
+    if (compileTime.isNotEmpty) {
+      return int.tryParse(compileTime) ?? 120;
+    }
+
+    final timeout = dotenv.env['API_TIMEOUT'] ?? '120';
     return int.tryParse(timeout) ?? 120;
   }
 
   static int get ragTimeout {
-    final timeout =
-        dotenv.env['RAG_TIMEOUT'] ??
-        const String.fromEnvironment('RAG_TIMEOUT', defaultValue: '120');
+    const compileTime = String.fromEnvironment('RAG_TIMEOUT', defaultValue: '');
+    if (compileTime.isNotEmpty) {
+      return int.tryParse(compileTime) ?? 120;
+    }
+
+    final timeout = dotenv.env['RAG_TIMEOUT'] ?? '120';
     return int.tryParse(timeout) ?? 120;
   }
 

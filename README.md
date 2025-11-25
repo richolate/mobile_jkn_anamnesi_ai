@@ -101,10 +101,32 @@ flutter build apk --release
 flutter build apk --split-per-abi --release
 ```
 
-### Web (Vercel-ready)
+### Web (Vercel)
+
+**Local Build:**
 ```bash
-flutter build web
+flutter build web --release \
+  --dart-define=GEMINI_API_KEY="your_key" \
+  --dart-define=RAG_SERVER_URL="http://localhost:8001"
 ```
+
+**Vercel Deployment:**
+
+1. **Set Environment Variables** di Vercel Dashboard:
+   - Go to: Project → Settings → Environment Variables
+   - Add variables (pilih **All** environments):
+     - `GEMINI_API_KEY` (required) ← Your API key
+     - `RAG_SERVER_URL` (optional)
+     - `GEMINI_MODEL` (optional)
+
+2. **Push ke GitHub:**
+   ```bash
+   git push origin master
+   ```
+
+3. **Vercel auto-deploy** menggunakan `scripts/vercel-build.sh`
+
+⚠️ **PENTING:** Environment variables di Vercel akan di-compile ke dalam JavaScript menggunakan `--dart-define`
 
 ---
 
@@ -118,7 +140,7 @@ GEMINI_MODEL=gemini-2.0-flash-lite
 API_TIMEOUT=120
 RAG_TIMEOUT=120
 ```
-⚠️ Do **not** commit `.env` to source control.
+⚠️ File `.env` untuk **local development only** - tidak di-commit ke Git
 
 ### Android Network Permissions
 ```xml
@@ -142,10 +164,32 @@ flutter pub get
 - Check internet connection
 - Regenerate API key if necessary
 
-**Web Issues (Vercel)**
-- Ensure `.env` is configured properly
-- Clear browser cache
-- Check browser console logs
+**Blank/Gray Screen di Web (Vercel)**
+
+Jika halaman menampilkan layar kosong abu-abu:
+
+1. **Check Environment Variables di Vercel:**
+   - Pastikan `GEMINI_API_KEY` sudah di-set
+   - Pilih scope **Production + Preview + Development**
+
+2. **Check Browser Console (F12):**
+   - Look for error: `GEMINI_API_KEY is empty`
+   - Look for error: `Failed to load .env`
+   - Network errors ke Google API
+
+3. **Redeploy dari Vercel:**
+   - Go to Deployments → Latest → ⋯ → Redeploy
+
+4. **Verify Build Logs:**
+   ```
+   ✅ Creating .env file from environment variables...
+   ✅ Building web with environment variables...
+   ✅ GEMINI_API_KEY=AIza... (first 4 chars shown)
+   ```
+
+5. **Clear Cache:**
+   - Browser: Ctrl+Shift+Delete
+   - Vercel: Settings → Git → Clear Build Cache
 
 ---
 

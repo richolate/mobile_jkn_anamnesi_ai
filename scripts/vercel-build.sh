@@ -51,6 +51,15 @@ flutter config --enable-web
 flutter config --no-analytics --no-cli-animations
 flutter --version
 flutter pub get
-flutter build web --release --no-tree-shake-icons
+
+# Build web with dart-define to compile environment variables into JS
+echo "Building web with environment variables..."
+flutter build web --release \
+  --no-tree-shake-icons \
+  --dart-define=GEMINI_API_KEY="${GEMINI_API_KEY:-}" \
+  --dart-define=RAG_SERVER_URL="${RAG_SERVER_URL:-http://localhost:8001}" \
+  --dart-define=GEMINI_MODEL="${GEMINI_MODEL:-gemini-2.0-flash-lite}" \
+  --dart-define=API_TIMEOUT="${API_TIMEOUT:-120}" \
+  --dart-define=RAG_TIMEOUT="${RAG_TIMEOUT:-120}"
 
 popd >/dev/null
