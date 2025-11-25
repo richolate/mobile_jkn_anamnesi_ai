@@ -36,7 +36,7 @@ Klik **Add New** untuk setiap variabel:
 
 ##### Variable 1: GEMINI_API_KEY (WAJIB!)
 - **Key:** `GEMINI_API_KEY`
-- **Value:** `AIzaSyApj6dOxpOVEA7IEDaAemhBy2vhRj7VWYU` (atau API key Anda)
+- **Value:** `your_actual_api_key_here`
 - **Environment:** ✅ Production ✅ Preview ✅ Development
 - Klik **Save**
 

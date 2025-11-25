@@ -36,7 +36,7 @@ cp .env.example .env
 
 Isi file `.env`:
 ```env
-GEMINI_API_KEY=AIzaSyApj6dOxpOVEA7IEDaAemhBy2vhRj7VWYU
+GEMINI_API_KEY=your_actual_api_key_here
 RAG_SERVER_URL=http://localhost:8001
 GEMINI_MODEL=gemini-2.0-flash-lite
 API_TIMEOUT=120

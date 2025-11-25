@@ -1,6 +1,5 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'dart:convert';
-import 'dart:io';
 import 'api_config.dart';
 import 'anamnesis_questions_bank.dart';
 
@@ -30,27 +29,34 @@ class GeminiService {
 
   // Helper method to handle network errors with better messages
   String _getErrorMessage(dynamic error) {
-    if (error is SocketException) {
+    // Check for network errors (works on both mobile and web)
+    final errorString = error.toString();
+    
+    if (errorString.contains('SocketException') || 
+        errorString.contains('Failed host lookup') ||
+        errorString.contains('NetworkException') ||
+        errorString.contains('XMLHttpRequest error')) {
       return 'Tidak dapat terhubung ke server Gemini AI.\n\n'
           'Kemungkinan penyebab:\n'
           '• Tidak ada koneksi internet\n'
           '• DNS tidak dapat menyelesaikan hostname\n'
           '• API Gemini sedang down\n'
           '• Firewall memblokir koneksi\n\n'
-          'Silakan periksa koneksi internet Anda dan coba lagi.';
-    } else if (error.toString().contains('Failed host lookup')) {
-      return 'Gagal mencari server Gemini AI (DNS lookup failed).\n\n'
-          'Solusi:\n'
-          '• Pastikan perangkat terhubung ke internet\n'
+          'Solusi untuk Android:\n'
+          '• Pastikan permission INTERNET sudah diaktifkan\n'
           '• Coba ganti DNS ke 8.8.8.8 (Google DNS)\n'
-          '• Restart aplikasi dan coba lagi';
-    } else if (error.toString().contains('API key')) {
+          '• Restart aplikasi dan coba lagi\n\n'
+          'Solusi untuk Web:\n'
+          '• Periksa koneksi internet browser\n'
+          '• Check browser console untuk error detail\n'
+          '• Pastikan environment variables sudah di-set di Vercel';
+    } else if (errorString.contains('API key')) {
       return 'API Key tidak valid atau tidak ditemukan.\n\n'
           'Solusi:\n'
           '• Periksa file .env dan pastikan GEMINI_API_KEY sudah diisi\n'
           '• Dapatkan API key baru di: https://makersuite.google.com/app/apikey';
     }
-    return 'Terjadi kesalahan: ${error.toString()}';
+    return 'Terjadi kesalahan: $errorString';
   }
 
   // ==========================================
@@ -197,8 +203,12 @@ Berikan HANYA JSON, tanpa penjelasan tambahan.
     } catch (e) {
       print('❌ Error generating questions from bank: ${_getErrorMessage(e)}');
 
-      // Rethrow with user-friendly message for critical errors
-      if (e is SocketException || e.toString().contains('Failed host lookup')) {
+      // Rethrow with user-friendly message for critical network errors
+      final errorString = e.toString();
+      if (errorString.contains('SocketException') || 
+          errorString.contains('Failed host lookup') ||
+          errorString.contains('NetworkException') ||
+          errorString.contains('XMLHttpRequest error')) {
         throw Exception(_getErrorMessage(e));
       }
 
