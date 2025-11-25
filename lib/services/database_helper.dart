@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
+// Mobile/Desktop implementation with SQLite
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
@@ -143,9 +144,10 @@ CREATE TABLE health_logs (
   // CONSULTATIONS CRUD
   // ==========================================
 
-  Future<int> insertConsultation(Map<String, dynamic> consultation) async {
+  Future<String> insertConsultation(Map<String, dynamic> consultation) async {
     final db = await database;
-    return await db.insert('consultations', consultation);
+    await db.insert('consultations', consultation);
+    return consultation['id'] as String;
   }
 
   Future<Map<String, dynamic>?> getConsultation(String id) async {
@@ -167,16 +169,13 @@ CREATE TABLE health_logs (
     return await db.query('consultations', orderBy: 'created_at DESC');
   }
 
-  Future<int> updateConsultation(
-    String id,
-    Map<String, dynamic> consultation,
-  ) async {
+  Future<int> updateConsultation(Map<String, dynamic> consultation) async {
     final db = await database;
     return await db.update(
       'consultations',
       consultation,
       where: 'id = ?',
-      whereArgs: [id],
+      whereArgs: [consultation['id']],
     );
   }
 
@@ -189,12 +188,12 @@ CREATE TABLE health_logs (
   // CONSULTATION ANSWERS CRUD
   // ==========================================
 
-  Future<int> insertAnswer(Map<String, dynamic> answer) async {
+  Future<void> insertConsultationAnswer(Map<String, dynamic> answer) async {
     final db = await database;
-    return await db.insert('consultation_answers', answer);
+    await db.insert('consultation_answers', answer);
   }
 
-  Future<List<Map<String, dynamic>>> getAnswersByConsultation(
+  Future<List<Map<String, dynamic>>> getConsultationAnswers(
     String consultationId,
   ) async {
     final db = await database;
@@ -219,12 +218,12 @@ CREATE TABLE health_logs (
   // DIAGNOSES CRUD
   // ==========================================
 
-  Future<int> insertDiagnosis(Map<String, dynamic> diagnosis) async {
+  Future<void> insertDiagnosis(Map<String, dynamic> diagnosis) async {
     final db = await database;
-    return await db.insert('diagnoses', diagnosis);
+    await db.insert('diagnoses', diagnosis);
   }
 
-  Future<Map<String, dynamic>?> getDiagnosisByConsultation(
+  Future<Map<String, dynamic>?> getDiagnosis(
     String consultationId,
   ) async {
     final db = await database;
@@ -256,9 +255,10 @@ CREATE TABLE health_logs (
   // IMAGE ANALYSES CRUD
   // ==========================================
 
-  Future<int> insertImageAnalysis(Map<String, dynamic> analysis) async {
+  Future<String> insertImageAnalysis(Map<String, dynamic> analysis) async {
     final db = await database;
-    return await db.insert('image_analyses', analysis);
+    await db.insert('image_analyses', analysis);
+    return analysis['id'] as String;
   }
 
   Future<Map<String, dynamic>?> getImageAnalysis(String id) async {

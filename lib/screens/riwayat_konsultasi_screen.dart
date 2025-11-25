@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'dart:io';
-import '../services/database_helper.dart';
-import '../services/pdf_service.dart';
+import '../services/database_service.dart';
+import '../services/pdf_export.dart';
 
 class RiwayatKonsultasiScreen extends StatefulWidget {
   const RiwayatKonsultasiScreen({Key? key}) : super(key: key);

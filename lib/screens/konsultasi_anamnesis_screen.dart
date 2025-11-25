@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
-import '../services/database_helper.dart';
+import '../services/database_service.dart';
 import '../services/gemini_service.dart';
-import '../services/pdf_service.dart';
+import '../services/pdf_export.dart';
 
 class KonsultasiAnamnesisScreen extends StatefulWidget {
   const KonsultasiAnamnesisScreen({Key? key}) : super(key: key);
@@ -191,7 +191,7 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
 
       // Save answer
       final answerId = const Uuid().v4();
-      await _dbHelper.insertAnswer({
+      await _dbHelper.insertConsultationAnswer({
         'id': answerId,
         'consultation_id': _consultationId,
         'question': _currentQuestion!['question'],
@@ -210,7 +210,8 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
       });
 
       // Update consultation
-      await _dbHelper.updateConsultation(_consultationId, {
+      await _dbHelper.updateConsultation({
+        'id': _consultationId,
         'questions_asked': _currentQuestionIndex + 1,
         'updated_at': DateTime.now().toIso8601String(),
       });
@@ -289,7 +290,7 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
         });
 
         // Get all answers from database
-        final answers = await _dbHelper.getAnswersByConsultation(
+        final answers = await _dbHelper.getConsultationAnswers(
           _consultationId,
         );
         List<Map<String, dynamic>> qaList = answers
@@ -302,7 +303,8 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
             .toList();
 
         // Update consultation with full data
-        await _dbHelper.updateConsultation(_consultationId, {
+        await _dbHelper.updateConsultation({
+          'id': _consultationId,
           'status': 'completed',
           'main_complaint': _complaintController.text,
           'questions_and_answers': json.encode(qaList),
@@ -358,7 +360,7 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
       });
 
       // Get all answers
-      final answers = await _dbHelper.getAnswersByConsultation(_consultationId);
+      final answers = await _dbHelper.getConsultationAnswers(_consultationId);
       final qaList = answers
           .map(
             (answer) => {

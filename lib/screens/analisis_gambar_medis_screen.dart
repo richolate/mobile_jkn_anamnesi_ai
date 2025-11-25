@@ -7,8 +7,8 @@ import 'dart:typed_data';
 import 'dart:convert';
 import '../utils/app_theme.dart';
 import '../services/gemini_service.dart';
-import '../services/database_helper.dart';
-import '../services/pdf_service.dart';
+import '../services/database_service.dart';
+import '../services/pdf_export.dart';
 
 class AnalisisGambarMedisScreen extends StatefulWidget {
   const AnalisisGambarMedisScreen({super.key});

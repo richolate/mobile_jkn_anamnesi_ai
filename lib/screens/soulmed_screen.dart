@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_markdown/flutter_markdown.dart';
-import '../services/database_helper.dart';
+import '../services/database_service.dart';
 import '../services/gemini_service.dart';
 import '../services/api_config.dart';
 
