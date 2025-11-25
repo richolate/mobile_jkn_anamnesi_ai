@@ -223,9 +223,7 @@ CREATE TABLE health_logs (
     await db.insert('diagnoses', diagnosis);
   }
 
-  Future<Map<String, dynamic>?> getDiagnosis(
-    String consultationId,
-  ) async {
+  Future<Map<String, dynamic>?> getDiagnosis(String consultationId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'diagnoses',

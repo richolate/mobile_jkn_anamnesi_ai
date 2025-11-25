@@ -1,7 +1,7 @@
 // Stub file for conditional imports
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
-  
+
   DatabaseHelper._init();
 
   Future<String> insertConsultation(Map<String, dynamic> consultation) async {
@@ -29,7 +29,8 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getConsultationAnswers(
-      String consultationId) async {
+    String consultationId,
+  ) async {
     throw UnimplementedError();
   }
 

@@ -582,10 +582,7 @@ class PdfService {
             border: pw.Border.all(color: PdfColors.grey300),
             borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
           ),
-          child: pw.Text(
-            content,
-            style: const pw.TextStyle(fontSize: 11),
-          ),
+          child: pw.Text(content, style: const pw.TextStyle(fontSize: 11)),
         ),
       ],
     );

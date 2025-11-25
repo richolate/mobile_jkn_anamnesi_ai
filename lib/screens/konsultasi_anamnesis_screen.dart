@@ -290,9 +290,7 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
         });
 
         // Get all answers from database
-        final answers = await _dbHelper.getConsultationAnswers(
-          _consultationId,
-        );
+        final answers = await _dbHelper.getConsultationAnswers(_consultationId);
         List<Map<String, dynamic>> qaList = answers
             .map(
               (answer) => {
