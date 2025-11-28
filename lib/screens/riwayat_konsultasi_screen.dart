@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 import '../services/database_service.dart';
 import '../services/pdf_export.dart';
+import 'pdf_preview_export.dart';
+
+// Conditional import for File
+import 'riwayat_file_helper_stub.dart'
+    if (dart.library.io) 'riwayat_file_helper_io.dart'
+    as file_helper;
 
 class RiwayatKonsultasiScreen extends StatefulWidget {
   const RiwayatKonsultasiScreen({Key? key}) : super(key: key);
@@ -839,45 +846,7 @@ class _RiwayatKonsultasiScreenState extends State<RiwayatKonsultasiScreen>
               const SizedBox(height: 24),
 
               // Display Image if available
-              if (analysis['image_path'] != null) ...[
-                Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(maxHeight: 300),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[300]!),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      File(analysis['image_path']),
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 200,
-                          color: Colors.grey[200],
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.image_not_supported,
-                                size: 60,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Gambar tidak dapat dimuat',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
+              _buildImageDisplay(analysis),
 
               // Description
               if (analysis['image_description'] != null) ...[
@@ -1267,6 +1236,111 @@ class _RiwayatKonsultasiScreenState extends State<RiwayatKonsultasiScreen>
     );
   }
 
+  // Build image display widget - handles both web (base64) and mobile (file path)
+  Widget _buildImageDisplay(Map<String, dynamic> analysis) {
+    // For web, use base64 if available
+    if (kIsWeb && analysis['image_base64'] != null) {
+      try {
+        final bytes = base64Decode(analysis['image_base64']);
+        return Column(
+          children: [
+            Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxHeight: 300),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.memory(
+                  bytes,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildImagePlaceholder();
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        );
+      } catch (e) {
+        return _buildImagePlaceholder();
+      }
+    }
+
+    // For mobile, use file path
+    if (!kIsWeb && analysis['image_path'] != null) {
+      return FutureBuilder<Uint8List?>(
+        future: file_helper.readFileBytes(analysis['image_path']),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.memory(
+                      snapshot.data!,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildImagePlaceholder();
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            );
+          }
+          return _buildImagePlaceholder();
+        },
+      );
+    }
+
+    // No image available
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildImagePlaceholder() {
+    return Column(
+      children: [
+        Container(
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[300]!),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.image_not_supported,
+                size: 60,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Gambar tidak dapat dimuat',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
   Future<void> _printAnamnesisPdf(Map<String, dynamic> consultation) async {
     try {
       Map<String, dynamic>? diagnosis;
@@ -1280,13 +1354,29 @@ class _RiwayatKonsultasiScreenState extends State<RiwayatKonsultasiScreen>
         questionsAndAnswers = List<Map<String, dynamic>>.from(parsed);
       }
 
-      await PdfService.generateAnamnesisPdf(
+      // Generate PDF bytes for preview
+      final pdfBytes = await PdfService.generateAnamnesisPdfBytes(
         consultationId: consultation['id'],
         mainComplaint: consultation['main_complaint'] ?? '',
         symptomStartDate: consultation['symptom_start_date'] ?? '',
         questionsAndAnswers: questionsAndAnswers,
         diagnosis: diagnosis ?? {},
       );
+
+      // Navigate to preview screen
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PdfPreviewScreen(
+              title: 'Laporan Konsultasi Anamnesis',
+              pdfBytes: pdfBytes,
+              fileName:
+                  'Konsultasi_Anamnesis_${consultation['id'].substring(0, 8)}.pdf',
+            ),
+          ),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
@@ -1302,12 +1392,44 @@ class _RiwayatKonsultasiScreenState extends State<RiwayatKonsultasiScreen>
         analysisResult = json.decode(analysis['analysis_result']);
       }
 
-      await PdfService.generateImageAnalysisPdf(
+      // Load image bytes - try base64 first (for web), then file path (for mobile)
+      Uint8List? imageBytes;
+
+      if (analysis['image_base64'] != null) {
+        // Use base64 image (stored for web)
+        try {
+          imageBytes = base64Decode(analysis['image_base64']);
+        } catch (e) {
+          print('Error decoding base64 image: $e');
+        }
+      }
+
+      if (imageBytes == null && !kIsWeb && analysis['image_path'] != null) {
+        // Try file path for mobile
+        imageBytes = await file_helper.readFileBytes(analysis['image_path']);
+      }
+
+      // Generate PDF bytes for preview
+      final pdfBytes = await PdfService.generateImageAnalysisPdfBytes(
         analysisId: analysis['id'],
         imageDescription: analysis['image_description'],
         analysisResult: analysisResult ?? {},
-        imagePath: analysis['image_path'], // Sertakan path gambar
+        imageBytes: imageBytes,
       );
+
+      // Navigate to preview screen
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PdfPreviewScreen(
+              title: 'Laporan Analisis Gambar Medis',
+              pdfBytes: pdfBytes,
+              fileName: 'Analisis_Gambar_${analysis['id'].substring(0, 8)}.pdf',
+            ),
+          ),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(
         context,

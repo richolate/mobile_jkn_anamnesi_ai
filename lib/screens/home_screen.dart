@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/app_theme.dart';
 import '../widgets/menu_item_widget.dart';
 import '../models/menu_item.dart';
 import 'menu_detail_screen.dart';
@@ -91,12 +90,6 @@ class _HomeScreenState extends State<HomeScreen> {
       iconImage: 'logo_menu_lainnya.png',
     ),
   ];
-
-  void _onBottomNavTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   void _navigateToMenu(MenuItem menuItem) {
     // Jika menu Anamnesa AI, navigasi ke screen khusus

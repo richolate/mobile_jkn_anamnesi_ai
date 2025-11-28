@@ -5,6 +5,8 @@ import 'dart:convert';
 import '../services/database_service.dart';
 import '../services/gemini_service.dart';
 import '../services/pdf_export.dart';
+import '../services/anamnesis_questions_bank.dart';
+import 'pdf_preview_export.dart';
 
 class KonsultasiAnamnesisScreen extends StatefulWidget {
   const KonsultasiAnamnesisScreen({Key? key}) : super(key: key);
@@ -36,6 +38,8 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
   String _consultationId = '';
   int _totalQuestions = 5;
   List<Map<String, dynamic>> _answersGiven = [];
+  bool _hasAddedReproductionQuestions =
+      false; // Flag untuk pertanyaan reproduksi
 
   // Final Diagnosis Data
   Map<String, dynamic>? _finalDiagnosis;
@@ -95,6 +99,8 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
           );
           _totalQuestions = result['totalQuestions'] ?? 5;
           _currentQuestionIndex = 0;
+          _hasAddedReproductionQuestions =
+              false; // Reset flag for new consultation
           _currentView = _ViewState.questions;
         });
 
@@ -153,6 +159,43 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
   // QUESTION VIEW - Q&A Process
   // ==========================================
 
+  /// Adds reproductive questions (32-34) for female users
+  void _addReproductionQuestions() {
+    // Get reproductive questions from the bank (questions 32, 33, 34)
+    final reproductionQuestions = AnamnesisQuestionsBank.getQuestionsByCategory(
+      'reproduksi',
+    );
+
+    if (reproductionQuestions.isNotEmpty) {
+      // Convert to Map format and insert before validasi questions
+      final reproQuestionsMap = reproductionQuestions
+          .map((q) => q.toJson())
+          .toList();
+
+      // Find the index of validasi questions (usually at the end)
+      int insertIndex = _allQuestions.length;
+      for (int i = 0; i < _allQuestions.length; i++) {
+        if (_allQuestions[i]['category'] == 'validasi') {
+          insertIndex = i;
+          break;
+        }
+      }
+
+      // Insert reproductive questions before validasi
+      _allQuestions.insertAll(insertIndex, reproQuestionsMap);
+
+      // Update total questions count
+      _totalQuestions += reproductionQuestions.length;
+
+      // Mark as added to prevent duplicate insertion
+      _hasAddedReproductionQuestions = true;
+
+      debugPrint(
+        'Added ${reproductionQuestions.length} reproductive questions for female user',
+      );
+    }
+  }
+
   Future<void> _submitAnswer() async {
     if (_selectedAnswer == null || _selectedAnswer!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -208,6 +251,14 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
         'questionIndex': _currentQuestionIndex,
         'detailedAnswer': detailedAnswer,
       });
+
+      // Check if user answered "Perempuan" for gender question
+      // and add reproductive questions if not already added
+      if (!_hasAddedReproductionQuestions &&
+          _currentQuestion!['question'] == 'Apa jenis kelamin Anda?' &&
+          _selectedAnswer == 'Perempuan') {
+        _addReproductionQuestions();
+      }
 
       // Update consultation
       await _dbHelper.updateConsultation({
@@ -368,7 +419,8 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
           )
           .toList();
 
-      await PdfService.generateAnamnesisPdf(
+      // Generate PDF bytes for preview
+      final pdfBytes = await PdfService.generateAnamnesisPdfBytes(
         consultationId: _consultationId,
         mainComplaint: _complaintController.text,
         symptomStartDate: _symptomStartDate?.toIso8601String() ?? '',
@@ -376,11 +428,21 @@ class _KonsultasiAnamnesisScreenState extends State<KonsultasiAnamnesisScreen> {
         diagnosis: _finalDiagnosis ?? {},
       );
 
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Navigate to preview screen
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('PDF berhasil dibuat dan siap dibagikan!'),
-            backgroundColor: Colors.green,
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PdfPreviewScreen(
+              title: 'Laporan Konsultasi Anamnesis',
+              pdfBytes: pdfBytes,
+              fileName:
+                  'Konsultasi_Anamnesis_${_consultationId.substring(0, 8)}.pdf',
+            ),
           ),
         );
       }

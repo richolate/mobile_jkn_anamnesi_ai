@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
 import '../utils/app_theme.dart';
@@ -25,7 +24,9 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
   final GeminiService _geminiService = GeminiService();
   final DatabaseHelper _db = DatabaseHelper.instance;
 
-  File? _selectedImage;
+  // For web, we use XFile and Uint8List instead of File
+  XFile? _selectedImageFile;
+  Uint8List? _selectedImageBytes;
   final TextEditingController _descriptionController = TextEditingController();
   bool _isAnalyzing = false;
   double _analysisProgress = 0.0;
@@ -65,8 +66,11 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
       );
 
       if (image != null) {
+        // Read bytes for web compatibility
+        final bytes = await image.readAsBytes();
         setState(() {
-          _selectedImage = File(image.path);
+          _selectedImageFile = image;
+          _selectedImageBytes = bytes;
           _analysisResult = null;
         });
         _animationController.forward(from: 0.0);
@@ -170,7 +174,7 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
   }
 
   Future<void> _analyzeImage() async {
-    if (_selectedImage == null) {
+    if (_selectedImageBytes == null) {
       _showErrorSnackbar('Pilih gambar terlebih dahulu');
       return;
     }
@@ -182,9 +186,9 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
     });
 
     try {
-      // Simulate progress steps
       await _updateProgress(0.2, 'Membaca gambar...');
-      final Uint8List imageBytes = await _selectedImage!.readAsBytes();
+      // Use already loaded bytes
+      final Uint8List imageBytes = _selectedImageBytes!;
 
       await _updateProgress(0.4, 'Mengirim ke AI...');
 
@@ -201,11 +205,12 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
 
       await _updateProgress(0.8, 'Menyimpan hasil...');
 
-      // Save to database
+      // Save to database (include base64 image for web display in history)
       _currentAnalysisId = const Uuid().v4();
       await _db.insertImageAnalysis({
         'id': _currentAnalysisId,
-        'image_path': _selectedImage!.path,
+        'image_path': _selectedImageFile?.name ?? 'web_upload',
+        'image_base64': base64Image, // Store base64 for web history display
         'image_description': _descriptionController.text.isEmpty
             ? null
             : _descriptionController.text,
@@ -280,7 +285,6 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
 
   Future<void> _launchMaps(String specialistType) async {
     try {
-      // Buat query lebih spesifik berdasarkan hasil analisis
       final primaryDiagnosis =
           _analysisResult?['primaryDiagnosis']?['diagnosis'] ?? '';
       final imageType = _analysisResult?['imageType'] ?? '';
@@ -300,12 +304,9 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
         );
       }
 
-      final mapsUrl = Uri.parse('geo:0,0?q=$query');
       final webUrl = Uri.parse('https://www.google.com/maps/search/$query');
 
-      if (await canLaunchUrl(mapsUrl)) {
-        await launchUrl(mapsUrl);
-      } else if (await canLaunchUrl(webUrl)) {
+      if (await canLaunchUrl(webUrl)) {
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
       } else {
         throw 'Could not launch maps';
@@ -427,13 +428,13 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                   const SizedBox(height: 24),
 
                   // Image Selection Section
-                  if (_selectedImage == null) ...[
+                  if (_selectedImageBytes == null) ...[
                     _buildEmptyImageState(),
                   ] else ...[
                     _buildSelectedImageState(),
                   ],
 
-                  if (_selectedImage != null) ...[
+                  if (_selectedImageBytes != null) ...[
                     const SizedBox(height: 24),
 
                     // Description Input
@@ -645,8 +646,9 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
             borderRadius: BorderRadius.circular(16),
             child: Stack(
               children: [
-                Image.file(
-                  _selectedImage!,
+                // Use Image.memory for web compatibility
+                Image.memory(
+                  _selectedImageBytes!,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -666,7 +668,8 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                       ),
                       onPressed: () {
                         setState(() {
-                          _selectedImage = null;
+                          _selectedImageFile = null;
+                          _selectedImageBytes = null;
                           _analysisResult = null;
                           _descriptionController.clear();
                         });
@@ -775,7 +778,6 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                 ),
                 const SizedBox(height: 20),
 
-                // Anatomical Area (if exists)
                 if (result['anatomicalArea'] != null) ...[
                   _buildResultSection(
                     icon: Icons.accessibility_new,
@@ -786,7 +788,6 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                   const SizedBox(height: 20),
                 ],
 
-                // Primary Diagnosis
                 _buildResultSection(
                   icon: Icons.medical_services,
                   title: 'Diagnosis Utama',
@@ -802,7 +803,6 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                   ),
                 ),
 
-                // Reasoning (if exists)
                 if (result['primaryDiagnosis']?['reasoning'] != null) ...[
                   const SizedBox(height: 8),
                   Container(
@@ -824,13 +824,11 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                 ],
                 const SizedBox(height: 20),
 
-                // Findings (if exists)
                 if (result['findings'] != null) ...[
                   _buildFindings(result['findings']),
                   const SizedBox(height: 20),
                 ],
 
-                // Differential Diagnoses
                 if (result['differentialDiagnoses'] != null &&
                     result['differentialDiagnoses'] is List &&
                     (result['differentialDiagnoses'] as List).isNotEmpty) ...[
@@ -838,13 +836,11 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                   const SizedBox(height: 20),
                 ],
 
-                // Recommendations
                 if (result['recommendations'] != null) ...[
                   _buildRecommendations(result['recommendations']),
                   const SizedBox(height: 20),
                 ],
 
-                // Red Flags
                 if (result['redFlags'] != null &&
                     result['redFlags'] is List &&
                     (result['redFlags'] as List).isNotEmpty) ...[
@@ -852,7 +848,6 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                   const SizedBox(height: 20),
                 ],
 
-                // Patient Education (if exists)
                 if (result['patientEducation'] != null &&
                     result['patientEducation'] is List &&
                     (result['patientEducation'] as List).isNotEmpty) ...[
@@ -879,7 +874,7 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                       Expanded(
                         child: Text(
                           result['disclaimer']?.toString() ??
-                              '⚠️ Hasil ini bukan diagnosis final. Segera konsultasikan dengan dokter untuk pemeriksaan lebih lanjut.',
+                              'Hasil ini bukan diagnosis final. Segera konsultasikan dengan dokter untuk pemeriksaan lebih lanjut.',
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.orange[900],
@@ -925,12 +920,6 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
         _analysisStep = 'Membuat laporan PDF...';
       });
 
-      // Read image bytes for PDF
-      Uint8List? imageBytes;
-      if (_selectedImage != null) {
-        imageBytes = await _selectedImage!.readAsBytes();
-      }
-
       // Generate PDF bytes for preview
       final pdfBytes = await PdfService.generateImageAnalysisPdfBytes(
         analysisId: _currentAnalysisId ?? 'unknown',
@@ -938,7 +927,7 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
             ? 'Tidak ada deskripsi'
             : _descriptionController.text,
         analysisResult: result,
-        imageBytes: imageBytes,
+        imageBytes: _selectedImageBytes,
       );
 
       setState(() {
@@ -1093,7 +1082,7 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                       Container(
                         width: 24,
                         height: 24,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.purple,
                           shape: BoxShape.circle,
                         ),
@@ -1345,7 +1334,6 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
         ),
         const SizedBox(height: 12),
 
-        // Normal findings
         if (findings['normal'] != null && findings['normal'] is List) ...[
           Container(
             padding: const EdgeInsets.all(12),
@@ -1379,7 +1367,7 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                   (finding) => Padding(
                     padding: const EdgeInsets.only(left: 26, top: 4),
                     child: Text(
-                      '• ${finding}',
+                      '• $finding',
                       style: TextStyle(fontSize: 13, color: Colors.grey[800]),
                     ),
                   ),
@@ -1390,7 +1378,6 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
           const SizedBox(height: 12),
         ],
 
-        // Abnormal findings
         if (findings['abnormal'] != null &&
             findings['abnormal'] is List &&
             (findings['abnormal'] as List).isNotEmpty) ...[
@@ -1422,7 +1409,7 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
                   (finding) => Padding(
                     padding: const EdgeInsets.only(left: 26, top: 4),
                     child: Text(
-                      '• ${finding}',
+                      '• $finding',
                       style: TextStyle(fontSize: 13, color: Colors.grey[800]),
                     ),
                   ),
@@ -1561,44 +1548,33 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
 
   String _formatConfidenceBadge(dynamic confidence) {
     if (confidence == null) return 'N/A';
-
     final str = confidence.toString();
     final numValue = int.tryParse(str);
-
     if (numValue != null) {
-      return '$numValue%'; // Show as percentage
+      return '$numValue%';
     }
-
-    return str.toUpperCase(); // Show as is for text values
+    return str.toUpperCase();
   }
 
   String _formatProbabilityBadge(dynamic probability) {
     if (probability == null) return 'N/A';
-
     final str = probability.toString();
     final numValue = int.tryParse(str);
-
     if (numValue != null) {
-      return '$numValue%'; // Show as percentage
+      return '$numValue%';
     }
-
-    return str.toUpperCase(); // Show as is for text values
+    return str.toUpperCase();
   }
 
   Color _getConfidenceColor(String? confidence) {
     if (confidence == null) return Colors.grey;
-
     final lower = confidence.toLowerCase();
-
-    // Handle numeric confidence (e.g., "90", "85")
     final numValue = int.tryParse(confidence);
     if (numValue != null) {
-      if (numValue >= 80) return Colors.green; // High confidence
-      if (numValue >= 50) return Colors.orange; // Medium confidence
-      return Colors.red; // Low confidence
+      if (numValue >= 80) return Colors.green;
+      if (numValue >= 50) return Colors.orange;
+      return Colors.red;
     }
-
-    // Handle text confidence
     switch (lower) {
       case 'high':
       case 'tinggi':
@@ -1616,18 +1592,13 @@ class _AnalisisGambarMedisScreenState extends State<AnalisisGambarMedisScreen>
 
   Color _getProbabilityColor(String? probability) {
     if (probability == null) return Colors.grey;
-
     final lower = probability.toLowerCase();
-
-    // Handle numeric probability (e.g., "90", "75")
     final numValue = int.tryParse(probability);
     if (numValue != null) {
-      if (numValue >= 70) return Colors.red; // High probability
-      if (numValue >= 40) return Colors.orange; // Medium probability
-      return Colors.blue; // Low probability
+      if (numValue >= 70) return Colors.red;
+      if (numValue >= 40) return Colors.orange;
+      return Colors.blue;
     }
-
-    // Handle text probability
     switch (lower) {
       case 'high':
       case 'tinggi':

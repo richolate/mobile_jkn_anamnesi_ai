@@ -47,7 +47,10 @@ class DatabaseHelper {
     );
 
     if (index != -1) {
-      consultations[index] = consultation;
+      // Merge existing data with new data (preserve existing fields, update new ones)
+      final existingData = Map<String, dynamic>.from(consultations[index]);
+      existingData.addAll(consultation);
+      consultations[index] = existingData;
       await prefs.setString('consultations', jsonEncode(consultations));
       return 1;
     }

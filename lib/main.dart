@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/soulmed_screen.dart';
 import 'screens/konsultasi_anamnesis_screen.dart';
-import 'screens/analisis_gambar_medis_screen.dart';
+import 'screens/analisis_gambar_export.dart';
 import 'utils/app_theme.dart';
 import 'services/api_config.dart';
 
